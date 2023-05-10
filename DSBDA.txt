@@ -1,0 +1,3032 @@
+Group A:3
+
+Write an application using HiveQL for flight information system which will include  
+a.	Creating, Dropping, and altering Database tables.  
+b.	Creating an external Hive table.  
+c.	Load table with data, insert new values and field in the table, Join tables with Hive  
+d.	Create index on Flight Information 
+Table  
+e.	Find the average departure delay per day in 2008.  
+
+1) Creating, Dropping, and altering Database tables. 
+ 
+student@student22:~$ jps 
+4724 NameNode 
+4852 DataNode 
+7017 Jps 
+5261 ResourceManager 
+5054 SecondaryNameNode 5390 NodeManager 
+student@student22:~$ cd /usr/local/hive/bin student@student22:/usr/local/hive/bin$ ./hive SLF4J: Class path contains multiple SLF4J bindings. 
+SLF4J: Found binding in [jar:file:/home/edureka/apache-hive-2.1.0-bin/lib/log4j-slf4j-impl2.4.1.jar!/org/slf4j/impl/StaticLoggerBinder.class] 
+SLF4J: Found binding in [jar:file:/usr/local/hadoop/hadoop-
+2.7.0/share/hadoop/common/lib/slf4j-log4j121.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class] 
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation. SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory] 
+ 
+Logging initialized using configuration in jar:file:/home/edureka/apache-hive-2.1.0bin/lib/hive-common-2.1.0.jar!/hive-log4j2.properties Async: true 
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. spark, tez) or using Hive 1.X releases. hive> set hive.cli.print.current.db=true;  
+ 
+hive (default)> show databases; 
+OK 
+Aatif aishwarya_desai default 
+Time taken: 0.291 seconds, Fetched: 4 row(s) hive (default)> use Aatif; 
+OK 
+Time taken: 0.01 seconds 
+hive (Aatif)> show tables; 
+OK 
+Aatif 
+Time taken: 0.039 seconds, Fetched: 1 row(s) 
+ 
+hive (Aatif)> Create Database TEIT; 
+OK 
+Time taken: 0.172 seconds 
+ 
+hive (Aatif)> use TEIT; 
+OK 
+Time taken: 0.007 seconds 
+ 
+hive (TEIT)> Create Table Student(FirstName STRING, LastName STRING, StudentId INT); 
+OK 
+Time taken: 0.361 seconds 
+ 
+hive (TEIT)> ALTER DATABASE TEIT SET DBPROPERTIES('creator' = 'Ansari Aatif', 'created_for' = 'Learning Hive'); 
+OK 
+Time taken: 0.103 seconds 
+ 
+hive (TEIT)> DESCRIBE DATABASE EXTENDED TEIT; OK 
+teit 	 	 
+hdfs://localhost:9000/user/hive/warehouse/teit.db studentUSER {creator=Ansari Aatif, created_for=Learning Hive} 
+Time taken: 0.009 seconds, Fetched: 1 row(s) 
+ 
+hive (TEIT)> DROP DATABASE TEIT CASCADE; 
+OK 
+Time taken: 1.6 seconds 
+ 
+hive (TEIT)> show databases; 
+OK 
+Aatif  aishwarya_desai default 
+Time taken: 0.005 seconds, Fetched: 4 row(s) hive (TEIT)>  
+ 
+2)  Creating an external Hive table.  
+ 
+hive (TEIT)> DROP DATABASE TEIT CASCADE; 
+OK 
+Time taken: 1.6 seconds 
+hive (TEIT)> show databases; 
+OK 
+Aatif aishwarya_desai default 
+Time taken: 0.005 seconds, Fetched: 4 row(s) 
+ 
+hive (TEIT)> create database TEIT; 
+OK 
+Time taken: 0.145 seconds 
+hive (TEIT)> use TEIT; 
+OK 
+Time taken: 0.006 seconds 
+hive (TEIT)> Create Table Student_Data(FirstName STRING, LastName STRING, StudentId INT); 
+OK 
+Time taken: 0.211 seconds 
+ 
+ 
+Download data set of 2007 & 2008 from http://stat-computing.org/dataexpo/2009/thedata.html 
+ 
+3) Load table with data,insert new values and fields in the table : 
+ 
+ 
+hive> set hive.cli.print.current.db=true; 
+hive (default)> show databases; 
+OK 
+Aatif aishwarya_desai default first flight te111 
+Time taken: 0.883 seconds, Fetched: 6 row(s) 
+ 
+hive (default)> create database TEIT; 
+OK 
+Time taken: 0.259 seconds 
+hive (default)> use TEIT; 
+OK 
+Time taken: 0.006 seconds 
+ 
+hive (TEIT)> CREATE TABLE IF NOT EXISTS Flight(Year SMALLINT, Month TINYINT, DayofMonth TINYINT, DayOfWeek TINYINT, DepTime SMALLINT) 
+COMMENT 'Flight' ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
+STORED AS TEXTFILE TBLPROPERTIES ('creator'= 'Ansari Aatif '); 
+OK 
+Time taken: 0.495 seconds 
+ 
+hive (TEIT)> load data local inpath '/home/student/Desktop/2007.csv' into table Flight; Loading data to table teit.flight 
+OK 
+Time taken: 1.381 seconds 
+ 
+hive (TEIT)> SELECT * FROM Flight; 
+OK 
+NULL NULL NULL NULL NULL 
+1987 	10 	14 	3 	741 
+1987 	10 	15 	4 	729 
+1987 	10 	17 	6 	741 
+1987 	10 	18 	7 	729 
+1987 	10 	19 	1 	749 
+1987 	10 	21 	3 	728 
+1987 	10 	22 	4 	728 
+1987 	10 	23 	5 	731 
+Time taken: 0.893 seconds, Fetched: 200 row(s) hive (TEIT)>  
+ 
+hive (TEIT)> CREATE TABLE IF NOT EXISTS Flight2009(Year SMALLINT, Month TINYINT, DayofMonth TINYINT, DayOfWeek TINYINT, DepTime SMALLINT) 
+COMMENT 'Flight' ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE TBLPROPERTIES ('creator'= 'Ansari Aatif '); 
+OK 
+Time taken: 0.083 seconds 
+ 
+hive (TEIT)> load data local inpath '/home/student/Desktop/2009dataset.csv' into table 
+Flight2009; 
+Loading data to table teit.flight2009 
+OK 
+Time taken: 0.583 seconds 
+hive (TEIT)> SELECT * FROM Flight2009; 
+OK 
+NULL NULL NULL NULL NULL 
+1987 	10 	14 	3 	741 
+1987 	10 	15 	4 	729 
+1987 	10 	17 	6 	741 
+1987 	10 	18 	7 	729 
+1987 	10 	19 	1 	749 
+1987 	10 	21 	3 	728 
+1987 	10 	22 	4 	728 
+1987 	10 	23 	5 	731 
+Time taken: 0.104 seconds, Fetched: 200 row(s) hive (TEIT)>  
+ 
+4) JOIN 
+ 
+hive (TEIT)> SELECT m8.Year, m8.Month, m7.Year, m7.Month FROM Flight2009 m8 JOIN Flight m7; 
+ 
+NULL NULL NULL NULL  1987 10 1987 10  
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+1987 	10 	1987 	10 	 
+ 
+5) Find the average departure delay per day in 2008. 
+ 
+Calculate average delay hive> select sum(delay) from hbase_flight_new; 
+Day 5 under the results in Step (B) — had the highest number of delays.  
+
+
+
+
+Group B:
+1. Perform the following operations using Python on the Facebook metrics data sets  
+a.	Create data subsets  
+b.	Merge Data  
+c.	Sort Data  
+d.	Transposing Data  
+e.	Shape and reshape Data  
+
+import pandas as pd
+import io
+data = pd.read_csv('dataset_Facebook.csv')
+data.head(2)
+   pagetotallikes  type  category  postmonth  postweekday  posthour  paid  \
+0          139441     2         2         12            4         3     0   
+1          139441     3         2         12            3        10     0   0
+   lifetimeposttotalreach  lifetimeposttotalimpressions  lifetimeengagedusers  \
+0                    2752                          5091                   178   
+1                   10460                         19057                  1457
+   lifetimepostconsumers  lifetimepostconsumptions  \
+0                    109                       159   
+1                   1361                      1674
+   lifetimepostimpressionsbypeoplewhohavelikedyourpage  \
+0                                               3078     
+1                                              11710     
+   lifetimepostreachbypeoplewholikeyourpage  \
+0                                      1640   
+1                                      6112   
+   lifetimepeoplewhohavelikedyourpageandengagedwithyourpost  comment  like  \
+0                                                119               4    79   
+1                                               1108               5   130   
+   share  totalinteractions  
+0     17                100  
+1     29                164  
+data.columns(2)
+Index(['pagetotallikes', 'type', 'category', 'postmonth', 'postweekday')
+data['type']
+0      2
+Name: type, Length: 372, dtype: int64
+data[["type","category"]]
+     type  category
+0       2         2
+data_subset=data[["type","category"]]
+data_subset
+     type  category
+0       2         2
+data_subset1=data[data["like"]>100]
+data.loc[1]
+pagetotallikes                                              139441
+data.loc[2]
+pagetotallikes                                              139441
+type                                                             2
+data.loc[[3,4]]
+   pagetotallikes  type  category  postmonth  postweekday  posthour  paid  \
+3          139441     2         2         12            2        10     1   
+4          139441     2         2         12            2         3     0  
+   lifetimeposttotalreach  lifetimeposttotalimpressions  lifetimeengagedusers  \
+3                   50128                         87991                  2211   
+4                    7244                         13594                   671 
+   lifetimepostconsumers  lifetimepostconsumptions  \
+3                    790                      1119   
+4                    410                       580  
+   lifetimepostimpressionsbypeoplewhohavelikedyourpage  \
+3                                              61027     
+4                                               6228  
+   lifetimepostreachbypeoplewholikeyourpage  \
+3                                     32048   
+4                                      3200  
+   lifetimepeoplewhohavelikedyourpageandengagedwithyourpost  comment  like  \
+3                                               1386              58  1572   
+4                                                396              19   325
+   share  totalinteractions  
+3    147               1777  
+4     49                393  
+data.loc[1:7,["like","share"]]
+   like  share
+1   130     29
+data.sort_values(by= "like", ascending=False)
+     pagetotallikes  type  category  postmonth  postweekday  posthour  paid  \
+252          111620     2         3          4            1        14     1  
+     lifetimeposttotalreach  lifetimeposttotalimpressions  \
+252                  105632                        147918   
+     lifetimeengagedusers  lifetimepostconsumers  lifetimepostconsumptions  \
+252                  3984                   2254                      3391 
+     lifetimepostimpressionsbypeoplewhohavelikedyourpage  \
+252                                              48575 
+     lifetimepostreachbypeoplewholikeyourpage  \
+252                                     27328   
+
+     lifetimepeoplewhohavelikedyourpageandengagedwithyourpost  comment  like  
+252                                               1936              51  1998
+     share  totalinteractions  
+252    128               2177  
+data.sort_values("like")
+     pagetotallikes  type  category  postmonth  postweekday  posthour  paid  \
+76           137893     2         1         11            3         2     0  
+     lifetimeposttotalreach  lifetimeposttotalimpressions  \
+76                     1228                          2392   
+     lifetimeengagedusers  lifetimepostconsumers  lifetimepostconsumptions  \
+76                     17                     17                        19  
+     lifetimepostimpressionsbypeoplewhohavelikedyourpage  \
+76                                                2392 
+     lifetimepostreachbypeoplewholikeyourpage  \
+76                                       1228   
+     lifetimepeoplewhohavelikedyourpageandengagedwithyourpost  comment  like  \
+76                                                  17               0     0
+     share  totalinteractions  
+76       0                  0  
+data.sort_values(by= "like", ascending=False,kind="mergesort")     pagetotallikes  type  category  postmonth  postweekday  posthour  paid  \
+252          111620     2         3          4            1        14     1 
+     lifetimeposttotalreach  lifetimeposttotalimpressions  \
+252                  105632                        147918   
+
+     lifetimeengagedusers  lifetimepostconsumers  lifetimepostconsumptions  \
+252                  3984                   2254                      3391   
+
+     lifetimepostimpressionsbypeoplewhohavelikedyourpage  \
+252                                              48575     
+
+     lifetimepostreachbypeoplewholikeyourpage  \
+252                                     27328   
+     lifetimepeoplewhohavelikedyourpageandengagedwithyourpost  comment  like  \
+252                                               1936              51  1998   
+     share  totalinteractions  
+252    128               2177  
+
+result=data.transpose()
+result
+                                                       0       1       2    \
+pagetotallikes                                      139441  139441  139441   
+
+selective_data=pd.DataFrame(data,columns=["like","paid","posthour","categery"])
+selective_data
+     like  paid  posthour  categery
+0      79     0         3       NaN
+1     130     0        10       NaN
+pivot_table=pd.DataFrame(selective_data,index=["like","categery"])
+pivot_table
+          like  paid  posthour  categery
+like       NaN   NaN       NaN       NaN
+categery   NaN   NaN       NaN       NaN
+pivot_table.shape
+(2, 4)
+pivot_table.reset_index(inplace=True)
+pivot_table
+      index  like  paid  posthour  categery
+0      like   NaN   NaN       NaN       NaN
+1  categery   NaN   NaN       NaN       NaN
+pivot_table.melt(id_vars=['like','paid'])
+   like  paid  variable     value
+0   NaN   NaN     index      like
+1   NaN   NaN     index  categery
+data1 = {'Name':['Jai', 'Princi', 'Gaurav', 'Anuj'], 
+        'Age':[27, 24, 22, 32], 
+        'Address':['Nagpur', 'Kanpur', 'Allahabad', 'Kannuaj'], 
+        'Qualification':['Msc', 'MA', 'MCA', 'Phd']} 
+
+
+data2 = {'Name':['Abhi', 'Ayushi', 'Dhiraj', 'Hitesh'], 
+        'Age':[17, 14, 12, 52], 
+        'Address':['Nagpur', 'Kanpur', 'Allahabad', 'Kannuaj'], 
+        'Qualification':['Btech', 'B.A', 'Bcom', 'B.hons']} 
+
+data3 = pd.DataFrame(data1,index=[0, 1, 2, 3])
+
+data4 = pd.DataFrame(data2, index=[4, 5, 6, 7])
+
+print(data3, "\n\n", data4) 
+     Name  Age    Address Qualification
+0     Jai   27     Nagpur           Msc
+1  Princi   24     Kanpur            MA
+2  Gaurav   22  Allahabad           MCA
+3    Anuj   32    Kannuaj           Phd 
+
+      Name  Age    Address Qualification
+4    Abhi   17     Nagpur         Btech
+5  Ayushi   14     Kanpur           B.A
+6  Dhiraj   12  Allahabad          Bcom
+7  Hitesh   52    Kannuaj        B.hons
+frames = [data3, data4]
+res1 = pd.concat(frames)
+res1
+     Name  Age    Address Qualification
+0     Jai   27     Nagpur           Msc
+1  Princi   24     Kanpur            MA
+2  Gaurav   22  Allahabad           MCA
+3    Anuj   32    Kannuaj           Phd
+4    Abhi   17     Nagpur         Btech
+5  Ayushi   14     Kanpur           B.A
+6  Dhiraj   12  Allahabad          Bcom
+7  Hitesh   52    Kannuaj        B.hons
+# Define a dictionary containing employee data 
+data1 = {'key': ['K0', 'K1', 'K2', 'K3'],
+         'Name':['Jai', 'Princi', 'Gaurav', 'Anuj'], 
+        'Age':[27, 24, 22, 32],} 
+   
+# Define a dictionary containing employee data 
+data2 = {'key': ['K0', 'K1', 'K2', 'K3'],
+         'Address':['Nagpur', 'Kanpur', 'Allahabad', 'Kannuaj'], 
+        'Qualification':['Btech', 'B.A', 'Bcom', 'B.hons']} 
+ 
+# Convert the dictionary into DataFrame  
+data5 = pd.DataFrame(data1)
+ 
+# Convert the dictionary into DataFrame  
+data6 = pd.DataFrame(data2) 
+  print(data5, "\n\n", data6) 
+
+res = pd.merge(data5, data6, on='key')
+res
+  key    Name  Age
+0  K0     Jai   27
+1  K1  Princi   24
+2  K2  Gaurav   22
+3  K3    Anuj   32 
+
+   key    Address Qualification
+0  K0     Nagpur         Btech
+1  K1     Kanpur           B.A
+2  K2  Allahabad          Bcom
+3  K3    Kannuaj        B.hons
+  key    Name  Age    Address Qualification
+0  K0     Jai   27     Nagpur         Btech
+1  K1  Princi   24     Kanpur           B.A
+2  K2  Gaurav   22  Allahabad          Bcom
+3  K3    Anuj   32    Kannuaj        B.hons
+# Define a dictionary containing employee data 
+data1 = {'key': ['K0', 'K1', 'K2', 'K3'],
+         'key1': ['K0', 'K1', 'K0', 'K1'],
+         'Name':['Jai', 'Princi', 'Gaurav', 'Anuj'], 
+        'Age':[27, 24, 22, 32],} 
+   
+# Define a dictionary containing employee data 
+data2 = {'key': ['K0', 'K1', 'K2', 'K3'],
+         'key1': ['K0', 'K0', 'K0', 'K0'],
+         'Address':['Nagpur', 'Kanpur', 'Allahabad', 'Kannuaj'], 
+        'Qualification':['Btech', 'B.A', 'Bcom', 'B.hons']} 
+ 
+# Convert the dictionary into DataFrame  
+data5 = pd.DataFrame(data1)
+ 
+# Convert the dictionary into DataFrame  
+data6 = pd.DataFrame(data2)   
+ print(data5, "\n\n", data6) 
+
+# merging dataframe using multiple keys
+res1 = pd.merge(data5, data6, on=['key', 'key1'])
+  key key1    Name  Age
+0  K0   K0     Jai   27
+1  K1   K1  Princi   24
+2  K2   K0  Gaurav   22
+3  K3   K1    Anuj   32 
+
+   key key1    Address Qualification
+0  K0   K0     Nagpur         Btech
+1  K1   K0     Kanpur           B.A
+2  K2   K0  Allahabad          Bcom
+3  K3   K0    Kannuaj        B.hons
+
+2. Perform the following operations using Python on the Air quality and Heart Disease data sets  
+a. Data cleaning  
+b.	Data integration  
+c.	Data transformation  
+d.	Error correcting  
+Data model building
+
+import pandas as pd
+import io
+data = pd.read_csv("Building_Permits.csv")
+data.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 23789 entries, 0 to 23788
+Data columns (total 43 columns):
+ #   Column                                  Non-Null Count  Dtype  
+---  ------                                  --------------  -----  
+ 0   Permit Number                           23789 non-null  object 
+ 1   Permit Type                             23789 non-null  int64  
+
+ data.count()
+Permit Number                             23789
+Permit Type                               23789
+
+data.isnull().sum()
+Permit Number                                 0
+Permit Type                                   0
+
+data.describe()
+        Permit Type  Street Number         Unit  Number of Existing Stories  \
+count  23789.000000   23789.000000  3612.000000                21856.000000   
+mean       7.539451    1121.124637   103.630122                    5.288022   
+std        1.423579    1137.481622   394.002532                    8.185713   
+min        1.000000       0.000000     0.000000                    0.000000   
+25%        8.000000     227.000000     0.000000                    2.000000   
+50%        8.000000     685.000000     0.000000                    3.000000   
+75%        8.000000    1741.000000     4.000000                    4.000000   
+max        8.000000    8338.000000  6000.000000                   63.000000   
+
+       Number of Proposed Stories  Voluntary Soft-Story Retrofit  \
+count                21801.000000                            0.0   
+mean                     5.337599                            NaN   
+std                      8.168639                            NaN   
+min                      0.000000                            NaN   
+25%                      2.000000                            NaN   
+50%                      3.000000                            NaN   
+75%                      4.000000                            NaN   
+max                     63.000000                            NaN   
+
+           Plansets  TIDF Compliance  Existing Construction Type  \
+count  23026.000000              0.0                21698.000000   
+mean       1.054851              NaN                    4.247857   
+std        0.999581              NaN                    1.474758   
+min        0.000000              NaN                    1.000000   
+25%        0.000000              NaN                    5.000000   
+50%        2.000000              NaN                    5.000000   
+75%        2.000000              NaN                    5.000000   
+max        7.000000              NaN                    5.000000   
+
+       Proposed Construction Type  Supervisor District       Zipcode  \
+count                21635.000000         23611.000000  23712.000000   
+mean                     4.244511             5.625090  94116.208376   
+std                      1.480709             2.919906      9.600294   
+min                      1.000000             1.000000  94102.000000   
+25%                      5.000000             3.000000  94109.000000   
+50%                      5.000000             6.000000  94115.000000   
+75%                      5.000000             8.000000  94122.000000   
+max                      5.000000            11.000000  94158.000000   
+
+          Record ID  
+count  2.378900e+04  
+mean   1.361302e+12  
+std    5.377189e+11  
+min    1.384530e+10  
+25%    1.591678e+12  
+50%    1.601008e+12  
+75%    1.610071e+12  
+max    1.620090e+12  
+data.count()
+Permit Number                             23789
+Permit Type                               23789
+
+data=data.drop(['Structural Notification','First Construction Document Date'], axis=1)
+data=data.dropna(subset=['Zipcode'])
+data.columns
+Index(['Permit Number', 'Permit Type', 'Permit Type Definition',
+Type',
+       'Proposed Construction Type Description', 'Site Permit',
+'Zipcode',
+       'Location', 'Record ID'],
+      dtype='object')
+data["Permit Type"].unique()
+array([8, 3, 1, 4, 7, 6, 2, 5], dtype=int64)
+data["Permit Type"]
+0        8
+1        8
+data.head(2)
+   Permit Number  Permit Type            Permit Type Definition  \
+0   202006309369            8            otc alterations permit   
+1   201709158573            8            otc alterations permit   
+   Permit Creation Date  Block  Lot  Street Number Street Number Suffix  \
+0            06/30/2020   3004  014            450                  NaN   
+1            09/15/2017   1523  040            426                  NaN 
+    Street Name Street Suffix  ...  Existing Construction Type  \
+0    Los Palmos            Dr  ...                         5.0   
+1          22nd            Av  ...                         5.0   
+   Existing Construction Type Description Proposed Construction Type  \
+0                          wood frame (5)                        5.0   
+1                          wood frame (5)                        5.0   
+   Proposed Construction Type Description Site Permit Supervisor District  \
+0                          wood frame (5)         NaN                 7.0   
+1                          wood frame (5)         NaN                 1.0   
+   Neighborhoods - Analysis Boundaries  Zipcode  \
+0                   West of Twin Peaks  94127.0   
+1                       Outer Richmond  94121.0   
+                                          Location      Record ID  
+0    POINT (-122.45197452604964 37.73467910501688)  1592749149755  
+1    POINT (-122.48114729116335 37.77963696393068)  1479743417392  
+selective_data=pd.DataFrame(data,columns=["Permit Number","Permit Creation Date","Proposed Construction Type Description"])
+selective_data.head(2)
+   Permit Number Permit Creation Date Proposed Construction Type Description
+0   202006309369           06/30/2020                         wood frame (5)
+1   201709158573           09/15/2017                         wood frame (5)
+
+data.head(2)
+  Permit Number  Permit Type            Permit Type Definition  \
+0  202006309369            8            otc alterations permit   
+1  201709158573            8            otc alterations permit   
+  Permit Creation Date Block  Lot  Street Number Street Number Suffix  \
+0           06/30/2020  3004  014            450                  NaN   
+1           09/15/2017  1523  040            426                  NaN   
+  Street Name Street Suffix  ...  Existing Construction Type  \
+0  Los Palmos            Dr  ...                         5.0   
+1        22nd            Av  ...                         5.0   
+  Existing Construction Type Description Proposed Construction Type  \
+0                         wood frame (5)                        5.0   
+1                         wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+1                         wood frame (5)         NaN                 1.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+1                      Outer Richmond  94121.0   
+                                        Location      Record ID  
+0  POINT (-122.45197452604964 37.73467910501688)  1592749149755  
+1  POINT (-122.48114729116335 37.77963696393068)  1479743417392  
+data[ 'Permit Creation Date'] = pd.to_datetime(data[ 'Permit Creation Date'], errors='coerce')
+data.head()
+  Permit Number  Permit Type            Permit Type Definition  \
+0  202006309369            8            otc alterations permit   
+1  201709158573            8            otc alterations permit   
+  Permit Creation Date Block  Lot  Street Number Street Number Suffix  \
+0           2020-06-30  3004  014            450                  NaN   
+1           2017-09-15  1523  040            426                  NaN   
+  Street Name Street Suffix  ...  Existing Construction Type  \
+0  Los Palmos            Dr  ...                         5.0   
+1        22nd            Av  ...                         5.0   
+  Existing Construction Type Description Proposed Construction Type  \
+0                         wood frame (5)                        5.0   
+1                         wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+1                         wood frame (5)         NaN                 1.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+1                      Outer Richmond  94121.0   
+                                        Location      Record ID  
+0  POINT (-122.45197452604964 37.73467910501688)  1592749149755  
+1  POINT (-122.48114729116335 37.77963696393068)  1479743417392  
+data.rename(columns={'Permit Creation Date': 'Date'}, inplace=True)
+data.columns
+Index(['Permit Number', 'Permit Type', 'Permit Type Definition', 'Date',
+       Name',
+       'Street Suffix', 'Unit', 'Unit Suffix', 'Description', 'Current Status',
+       'Current Status Date', 'Filed Date', 'Issued Date', 'Completed Date',
+       Type',
+       'Proposed Construction Type Description', 'Site Permit',
+       'Zipcode',
+       'Location', 'Record ID'],
+      dtype='object')
+data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+data.head(2)
+  Permit Number  Permit Type            Permit Type Definition       Date  \
+0  202006309369            8            otc alterations permit 2020-06-30   
+1  201709158573            8            otc alterations permit 2017-09-15   
+  Block  Lot  Street Number Street Number Suffix Street Name Street Suffix  \
+0  3004  014            450                  NaN  Los Palmos            Dr   
+1  1523  040            426                  NaN        22nd            Av   
+   ...  Existing Construction Type Description Proposed Construction Type  \
+0  ...                          wood frame (5)                        5.0   
+1  ...                          wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+1                         wood frame (5)         NaN                 1.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+1                      Outer Richmond  94121.0   
+                                        Location      Record ID  year  
+0  POINT (-122.45197452604964 37.73467910501688)  1592749149755  2020  
+1  POINT (-122.48114729116335 37.77963696393068)  1479743417392  2017  
+[5 rows x 42 columns]
+data['year'] = data.Date.dt.year
+data.head(1)
+   Permit Number  Permit Type            Permit Type Definition       Date  \
+0   202006309369            8            otc alterations permit 2020-06-30   
+    Block Lot Street Number Street Number Suffix  Street Name Street Suffix \
+    ...  Existing Construction Type Description Proposed Construction Type  \
+0   ...                          wood frame (5)                        5.0   
+   Proposed Construction Type Description Site Permit Supervisor District  \
+0                          wood frame (5)         NaN                 7.0   
+   Neighborhoods - Analysis Boundaries  Zipcode  \
+0                   West of Twin Peaks  94127.0   
+                                          Location      Record ID  year  
+0    POINT (-122.45197452604964 37.73467910501688)  1592749149755  2020  
+COLS = ['Record ID', 'Permit Type']
+import numpy as np
+from sklearn.impute import SimpleImputer
+# invoking SimpleImputer to fill missing values
+imputer = SimpleImputer(missing_values=np.nan, strategy='mean')
+data[COLS] = imputer.fit_transform(data[COLS])
+data.head(1)
+  Permit Number  Permit Type            Permit Type Definition       Date  \
+0  202006309369          8.0            otc alterations permit 2020-06-30   
+  Block  Lot  Street Number Street Number Suffix Street Name Street Suffix  \
+0  3004  014            450                  NaN  Los Palmos            Dr   
+   ...  Existing Construction Type Description Proposed Construction Type  \
+0  ...                          wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+                                        Location     Record ID  year  
+0  POINT (-122.45197452604964 37.73467910501688)  1.592749e+12  2020  
+[5 rows x 42 columns]
+data.info(2)
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 23712 entries, 0 to 23788
+Data columns (total 42 columns):
+ #   Column                                  Non-Null Count  Dtype         
+---  ------                                  --------------  -----         
+ 0   Permit Number                           23712 non-null  object        
+ 1   Permit Type                             23712 non-null  float64       
+data['Permit Type'].value_counts()
+8.0    21386
+3.0     1725
+data.head()
+  Permit Number  Permit Type            Permit Type Definition       Date  \
+0  202006309369          8.0            otc alterations permit 2020-06-30   
+1  201709158573          8.0            otc alterations permit 2017-09-15   
+  Block  Lot  Street Number Street Number Suffix Street Name Street Suffix  \
+0  3004  014            450                  NaN  Los Palmos            Dr   
+1  1523  040            426                  NaN        22nd            Av   
+   ...  Existing Construction Type Description Proposed Construction Type  \
+0  ...                          wood frame (5)                        5.0   
+1  ...                          wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+1                         wood frame (5)         NaN                 1.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+1                      Outer Richmond  94121.0   
+                                        Location     Record ID  year  
+0  POINT (-122.45197452604964 37.73467910501688)  1.592749e+12  2020  
+1  POINT (-122.48114729116335 37.77963696393068)  1.479743e+12  2017  
+
+data['Street Name'].replace({"Los Palmos":1, "22nd":2, "Woodland":3,"Folsom":4}, inplace= True)
+data["Street Name"]
+0                       1
+1                       2
+data['Permit Type Definition'].value_counts()
+otc alterations permit                 21386
+additions alterations or repairs        1725
+from sklearn.preprocessing import LabelEncoder
+labelencoder=LabelEncoder()
+data["Permit Type Definition"]=labelencoder.fit_transform(data["Permit Type Definition"])
+data.head(2)
+  Permit Number  Permit Type  Permit Type Definition       Date Block  Lot  \
+0  202006309369          8.0                       5 2020-06-30  3004  014   
+1  201709158573          8.0                       5 2017-09-15  1523  040   
+   Street Number Street Number Suffix Street Name Street Suffix  ...  \
+0            450                  NaN           1            Dr  ...   
+1            426                  NaN           2            Av  ...   
+   Existing Construction Type Description Proposed Construction Type  \
+0                          wood frame (5)                        5.0   
+1                          wood frame (5)                        5.0   
+  Proposed Construction Type Description Site Permit Supervisor District  \
+0                         wood frame (5)         NaN                 7.0   
+1                         wood frame (5)         NaN                 1.0   
+  Neighborhoods - Analysis Boundaries  Zipcode  \
+0                  West of Twin Peaks  94127.0   
+1                      Outer Richmond  94121.0   
+                                        Location     Record ID  year  
+0  POINT (-122.45197452604964 37.73467910501688)  1.592749e+12  2020  
+1  POINT (-122.48114729116335 37.77963696393068)  1.479743e+12  2017  
+datanew=data[(data['Permit Type Definition']==0)]
+datanew
+      Permit Number  Permit Type  Permit Type Definition       Date Block  \
+2      201810163321          3.0                       0 2018-10-16  2631   
+        Lot  Street Number Street Number Suffix        Street Name  \
+2       014             55                  NaN                  3   
+...  Existing Construction Type Description  \
+2                Av  ...                          wood frame (5)   
+      Proposed Construction Type Proposed Construction Type Description  \
+2                            5.0                         wood frame (5)   
+      Site Permit Supervisor District Neighborhoods - Analysis Boundaries  \
+2               Y                 5.0                        Inner Sunset   
+       Zipcode                                      Location     Record ID  \
+2      94117.0   POINT (-122.45351446226252 37.76314572486811)  1.528247e+12   
+       year  
+2      2018  
+[1725 rows x 42 columns]
+datanew['Permit Type Definition'].value_counts()
+0    1725
+Name: Permit Type Definition, dtype: int64
+from sklearn.preprocessing import OneHotEncoder
+onehotencoder=OneHotEncoder(sparse=False,handle_unknown='error',drop='first')
+pd.DataFrame(onehotencoder.fit_transform(datanew[["Permit Type Definition"]]))
+Empty DataFrame
+Columns: []
+Index: [0, 1, 2, 3, 4,..,19,99, ...]
+
+4. Visualize the data using Python libraries matplotlib, seaborn by plotting the graphs for assignment no. 2 and 3 (Group B)  
+ Out[4]:
+1	67	1	4	160	286	0	2	108	1	1.5	2	3	3	2
+2	67	1	4	120	229	0	2	129	1	2.6	2	2	7	1
+3	37	1	3	130	250	0	0	187	0	3.5	3	0	3	0
+4	41	0	2	130	204	0	2	172	0	1.4	1	0	3	0
+ 
+ 
+ 
+Out[29]: <seaborn.axisgrid.PairGrid at 0xde46aadfd0>
+<Figure size 1200x1200 with 0 Axes>
+ 
+In [ ]: 
+In [ ]: 
+	0	97
+Out[46]: ([<matplotlib.patches.Wedge at 0xde3716a3d0>,
+ <matplotlib.patches.Wedge at 0xde3716a850>],
+[Text(-0.5890242258008583, 0.9290050922463771, '1'),
+ 
+
+Group C: Create a review scrapper for any ecommerce website to fetch real time comments, reviews, ratings, comment tags, customer name using Python.  
+
+import pandas as pd
+from bs4 import BeautifulSoup
+from requests import get
+
+
+url='https://www.flipkart.com/search?q=tv+smart+tv&sid=ckf%2Cczl&as=on&as-show=on&otracker=AS_QueryStore_OrganicAutoSuggest_1_2_na_na_na&otracker1=AS_QueryStore_OrganicAutoSuggest_1_2_na_na_na&as-pos=1&as-type=RECENT&suggestionId=tv+smart+tv%7CTelevisions&requestId=b12db4dc-db18-45fc-81d3-afdd75727661&as-backfill=on'
+url
+
+
+response=get(url)
+response
+
+
+soup=BeautifulSoup(response.text,'lxml')
+
+
+master_container=soup.find_all('div',{'class':'_2kHMtA'})
+
+tv_name=[]
+for i in range(len(master_container)):
+    try:
+        tv_name.append(master_container[i].find('div',{'class':'_4rR01T'}).text)
+    except:
+        tv_name.append(None)
+
+
+
+len(tv_name)
+
+
+ratings=[]
+for i in range(len(master_container)):
+    try:
+        ratings.append(master_container[i].find('div',{'class':'_3LWZlK'}).text)
+    except:
+        ratings.append(None)
+
+
+len(ratings)
+
+
+price=[]
+for i in range(len(master_container)):
+    try:
+        price.append(master_container[i].find('div',{'class':'_30jeq3 _1_WHN1'}).text)
+    except:
+        price.append(None)
+
+
+len(price)
+
+
+review=[]
+for i in range(len(master_container)):
+    try:
+        review.append(master_container[i].find('span',{'class':'_2_R_DZ'}).text)
+    except:
+        review.append(None)
+
+
+len(review)
+
+
+data={"TV":tv_name,'Ratings':ratings,'Price':price,'Reviews':review}
+
+data=pd.DataFrame(data)
+
+
+data
+
+
+Hadoop :
+
+sudo rm -rf /usr/local/hadoop_store/
+sudo mkdir -p /usr/local/hadoop_store/hdfs/namenode
+sudo mkdir -p /usr/local/hadoop_store/hdfs/datanode
+sudo chown -R student:student /usr/local/hadoop_store
+hdfs namenode -format
+start-dfs.sh
+start-yarn.sh
+jps
+
+
+
+
+
+
+
+student@itmml20:/usr/local/hadoop$ hdfs dfs -put ~/abc.txt /abcd
+
+ hdfs dfs -put ~/test_hadoop.txt /test_hadoop_HDFS     //// create test_hadoop.txt at home
+
+
+hdfs dfs -cat /test_hadoop_HDFS         ///test_hadoop_HDFS -u can see it with broswer
+
+hdfs dfs -mkdir /myhadoopApp   //create directoty
+
+
+ hdfs dfs -put ~/test_hadoop.txt /myhadoopApp/mytest     //put file from home to hdfs folder
+ hdfs dfs -ls /myhadoopApp      //list out the files	
+http://localhost:8088/cluster     //to get cluster info
+http://localhost:50070/explorer.html#/     to get file and directories details
+
+
+
+Steps::
+sudo apt-get update sudo apt-get install openjdk-7-jre-headless sudo apt-get install openjdk-7-jdk sudo apt-get install ssh sudo apt-get install rsync 
+# Download hadoop from  :  http://www.eu.apache.org/dist/hadoop/common/stable/hadoop-2.7.1.tar.gz 
+# copy and extract hadoop-2.7.1.tar.gz in home folder 
+# rename the name of the extracted folder from hadoop-2.7.1 to hadoop readlink -f /usr/bin/javac 
+# find whether ubuntu is 32 bit (i686) or 64 bit (x86_64) uname -i
+gedit ~/hadoop/etc/hadoop/hadoop-env.sh # add following line in it
+# for 32 bit ubuntu
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386 
+# for 64 bit ubuntu
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64 
+# save and exit the file
+# to display the usage documentation for the hadoop script try next command ~/hadoop/bin/hadoop 
+ 
+#  1.   standalone mode mkdir input cp ~/hadoop/etc/hadoop/*.xml input 
+~/hadoop/bin/hadoop jar ~/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar grep input output 'us[a-z.]+' cat output/* 
+# Our task is done, so remove input and output folders rm -r input output
+ 
+#  2.  Pseudo-Distributed mode 
+# get your user name 
+whoami 
+# remember your user name, we'll use it in the next step gedit ~/hadoop/etc/hadoop/core-site.xml 
+<configuration> 
+    <property> 
+        <name>fs.defaultFS</name> 
+        <value>hdfs://localhost:1234</value> 
+    </property> </configuration> gedit ~/hadoop/etc/hadoop/hdfs-site.xml 
+<configuration> 
+<property> 
+<name>dfs.replication</name> 
+<value>1</value> 
+</property> 
+<property> 
+<name>dfs.name.dir</name> 
+<value>file:///home/your_user_name/hadoop/name_dir</value> </property> 
+<property> 
+<name>dfs.data.dir</name> 
+<value>file:///home/your_user_name/hadoop/data_dir</value> </property> 
+</configuration>
+#Setup passphraseless/passwordless ssh ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys 
+export HADOOP\_PREFIX=/home/your_user_name/hadoop 
+ssh localhost 
+# type exit in the terminal to close the ssh connection (very important) exit
+# The following instructions are to run a MapReduce job locally. 
+#Format the filesystem:( Do it only once ) ~/hadoop/bin/hdfs namenode -format 
+#Start NameNode daemon and DataNode daemon: ~/hadoop/sbin/start-dfs.sh 
+#Browse the web interface for the NameNode; by default it is available at: http://localhost:50070/ 
+#Make the HDFS directories required to execute MapReduce jobs: ~/hadoop/bin/hdfs dfs -mkdir /user 
+~/hadoop/bin/hdfs dfs -mkdir /user/your_user_name 
+#Copy the sample files (from ~/hadoop/etc/hadoop) into the distributed filesystem folder(input) ~/hadoop/bin/hdfs dfs -put ~/hadoop/etc/hadoop input 
+#Run the example map-reduce job 
+~/hadoop/bin/hadoop jar ~/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar grep input output 'us[a-z.]+' 
+#View the output files on the distributed filesystem ~/hadoop/bin/hdfs dfs -cat output/* 
+#Copy the output files from the distributed filesystem to the local filesystem and examine them: 
+~/hadoop/bin/hdfs dfs -get output output 
+#ignore warnings (if any) cat output/* 
+# remove local output folder rm -r output
+# remove distributed folders (input & output) ~/hadoop/bin/hdfs dfs -rm -r input output
+#When you’re done, stop the daemons with 
+~/hadoop/sbin/stop-dfs.sh 
+
+Start hadoop - ~/hadoop/sbin/start-dfs.sh
+Step-1
+
+virtue@virtue-OptiPlex-745:~$ jps
+
+13440 DataNode
+13266 NameNode
+13652 SecondaryNameNode
+18886 org.eclipse.equinox.launcher_1.3.201.v20161025-1711.jar
+19416 Jps
+
+Step-2
+
+
+virtue@virtue-OptiPlex-745:~$ hadoop/bin/hadoop dfs -mkdir /user/virtue/input2
+
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+Step-3
+
+virtue@virtue-OptiPlex-745:~$ hadoop/bin/hadoop dfs -ls /user/virtue/
+
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+Found 5 items
+drwxr-xr-x   - virtue supergroup          0 2017-04-04 15:08 /user/virtue/input
+drwxr-xr-x   - virtue supergroup          0 2017-04-04 16:37 /user/virtue/input1
+drwxr-xr-x   - virtue supergroup          0 2017-04-04 18:14 /user/virtue/input2
+drwxr-xr-x   - virtue supergroup          0 2017-04-04 15:09 /user/virtue/output
+-rw-r--r--   1 virtue supergroup         56 2017-04-04 16:36 /user/virtue/sample.txt
+
+Step-4
+
+virtue@virtue-OptiPlex-745:~$ hadoop/bin/hadoop dfs -put '/home/virtue/access_log_short.txt' /user/virtue/input2/
+
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+Step-5
+
+virtue@virtue-OptiPlex-745:~$ hadoop/bin/hadoop dfs -ls /user/virtue/input2
+
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+Found 1 items
+-rw-r--r--   1 virtue supergroup     143084 2017-04-04 18:16 /user/virtue/input2/access_log_short.txt
+
+Step-6
+
+virtue@virtue-OptiPlex-745:~$  cd Desktop	
+
+Step- 7
+
+virtue@virtue-OptiPlex-745:~/Desktop$ ls
+ADBMS_Setups  CharCount.jar  Sample.jar
+
+Step-8
+
+
+virtue@virtue-OptiPlex-745:~/Desktop$ ~/hadoop/bin/hadoop jar Sample.jar mainpkg.Test input2 output2
+17/04/04 18:28:01 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
+17/04/04 18:28:01 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+17/04/04 18:28:01 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+17/04/04 18:28:01 INFO input.FileInputFormat: Total input paths to process : 1
+17/04/04 18:28:02 INFO mapreduce.JobSubmitter: number of splits:1
+17/04/04 18:28:04 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local2074403040_0001
+17/04/04 18:28:05 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+17/04/04 18:28:05 INFO mapreduce.Job: Running job: job_local2074403040_0001
+17/04/04 18:28:05 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+17/04/04 18:28:05 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/04 18:28:05 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+17/04/04 18:28:05 INFO mapred.LocalJobRunner: Waiting for map tasks
+17/04/04 18:28:05 INFO mapred.LocalJobRunner: Starting task: attempt_local2074403040_0001_m_000000_0
+17/04/04 18:28:05 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/04 18:28:06 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/04 18:28:06 INFO mapred.MapTask: Processing split: hdfs://localhost:1234/user/virtue/input2/access_log_short.txt:0+143084
+17/04/04 18:28:06 INFO mapreduce.Job: Job job_local2074403040_0001 running in uber mode : false
+17/04/04 18:28:07 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/04 18:28:07 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/04 18:28:07 INFO mapred.MapTask: soft limit at 83886080
+17/04/04 18:28:07 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/04 18:28:07 INFO mapreduce.Job:  map 0% reduce 0%
+17/04/04 18:28:07 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/04 18:28:08 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.223.157.186
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.207.190.45
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.216.113.172
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.153.239.5
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.153.239.5
+10.153.239.5
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.153.239.5
+10.187.129.140
+10.187.129.140
+10.187.129.140
+10.187.129.140
+10.187.129.140
+10.187.129.140
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.82.30.199
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.130.195.163
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.211.47.159
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.102.101.66
+10.32.247.175
+10.32.247.175
+10.32.247.175
+10.32.247.175
+10.247.175.65
+10.114.74.30
+10.209.54.187
+10.209.54.187
+10.209.54.187
+10.205.72.238
+10.205.72.238
+10.216.113.172
+10.243.51.109
+10.243.51.109
+10.243.51.109
+10.243.51.109
+10.243.51.109
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.245.208.15
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.82.64.235
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.119.117.132
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.133.222.184
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.150.212.239
+10.94.196.42
+10.240.170.50
+10.84.236.242
+10.190.41.42
+10.190.41.42
+10.190.41.42
+10.190.41.42
+10.190.41.42
+10.118.19.97
+10.239.52.68
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.32.55.216
+10.48.81.158
+10.34.233.107
+10.2.202.135
+10.5.132.217
+10.108.91.151
+10.48.81.158
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.241.107.75
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.104.73.51
+10.88.204.177
+10.143.126.177
+10.175.149.65
+10.5.148.29
+10.250.166.232
+10.27.134.23
+10.143.126.177
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.218.16.176
+10.239.52.68
+10.48.81.158
+10.105.160.183
+10.95.136.211
+10.95.136.211
+10.95.136.211
+10.95.136.211
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.175.204.125
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.203.194.139
+10.185.152.140
+10.53.58.58
+10.25.132.238
+10.25.132.238
+10.132.19.125
+10.132.19.125
+10.187.177.220
+10.11.131.40
+10.143.126.177
+10.73.238.200
+10.143.126.177
+10.208.38.46
+10.143.126.177
+10.87.88.214
+10.62.78.165
+10.62.78.165
+10.119.33.245
+10.212.122.173
+10.48.81.158
+10.229.60.23
+10.81.134.180
+10.76.143.30
+10.239.52.68
+10.215.222.114
+10.36.200.176
+10.225.234.46
+10.239.100.52
+10.153.23.63
+10.153.23.63
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.187.28.68
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.134.110.196
+10.89.244.42
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.111.71.20
+10.225.137.152
+10.123.124.47
+10.170.178.53
+10.143.126.177
+10.206.108.96
+10.206.108.96
+10.239.52.68
+10.206.175.236
+10.109.21.76
+10.164.49.105
+10.164.49.105
+10.164.49.105
+10.48.81.158
+10.164.49.105
+10.164.49.105
+10.164.49.105
+10.164.49.105
+10.164.49.105
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.80.10.131
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.61.23.77
+10.213.181.38
+10.213.181.38
+10.213.181.38
+10.213.181.38
+10.141.221.57
+10.141.221.57
+10.213.181.38
+10.141.221.57
+10.213.181.38
+10.213.181.38
+10.112.227.184
+10.112.227.184
+10.112.227.184
+10.112.227.184
+10.112.227.184
+10.112.227.184
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.128.11.75
+10.141.221.57
+10.128.11.75
+10.70.238.46
+10.70.238.46
+10.70.238.46
+10.70.238.46
+10.70.238.46
+10.70.238.46
+10.200.9.128
+10.200.9.128
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.143.126.177
+10.54.49.229
+10.143.126.177
+10.141.221.57
+10.103.63.29
+10.143.126.177
+10.143.126.177
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.15.23.44
+10.179.107.170
+10.179.107.170
+10.1.232.31
+10.1.232.31
+10.1.232.31
+10.1.232.31
+10.1.232.31
+10.124.148.99
+10.25.44.247
+10.25.44.247
+10.25.44.247
+10.25.44.247
+10.25.44.247
+10.25.44.247
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.59.42.194
+10.33.181.9
+10.33.181.9
+10.33.181.9
+10.33.181.9
+10.59.42.194
+10.33.181.9
+10.33.181.9
+10.33.181.9
+10.59.42.194
+10.33.181.9
+10.24.150.4
+10.24.150.4
+10.24.150.4
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.24.150.4
+10.24.150.4
+10.103.190.81
+10.156.152.9
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.236.231.63
+10.4.59.153
+10.214.35.48
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.248.24.219
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.61.161.218
+10.103.190.81
+10.134.242.87
+10.169.158.88
+10.231.55.231
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.103.190.81
+10.12.219.30
+10.103.190.81
+10.119.74.120
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.246.151.162
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.167.1.145
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.246.151.162
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.24.67.131
+10.144.147.8
+10.240.144.183
+10.246.151.162
+10.199.189.15
+10.41.170.233
+10.41.170.233
+10.41.170.233
+10.41.170.233
+10.41.170.233
+10.41.170.233
+10.99.228.224
+10.221.62.23
+10.221.62.23
+10.41.170.233
+10.41.170.233
+10.41.170.233
+10.234.15.156
+10.221.62.23
+10.73.64.91
+10.140.139.116
+10.42.208.60
+10.221.62.23
+10.221.62.23
+10.240.144.183
+10.41.40.17
+10.98.156.141
+10.221.62.23
+10.221.62.23
+10.221.62.23
+10.221.62.23
+10.221.62.23
+10.157.176.158
+10.52.161.126
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.12.113.198
+10.76.68.178
+10.12.113.198
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.76.68.178
+10.131.209.116
+10.131.209.116
+10.131.209.116
+10.131.209.116
+10.131.209.116
+10.56.48.40
+10.61.232.147
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.78.95.24
+10.39.45.70
+10.221.40.89
+10.39.45.70
+10.248.36.117
+10.221.40.89
+10.221.40.89
+10.221.40.89
+10.221.40.89
+10.248.36.117
+10.248.36.117
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.152.195.138
+10.216.227.195
+10.61.232.147
+10.216.227.195
+10.39.94.109
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.216.227.195
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.117.76.22
+10.61.232.147
+10.117.76.22
+10.240.144.183
+10.240.144.183
+10.39.94.109
+10.56.48.40
+10.14.4.151
+10.14.4.151
+10.56.48.40
+10.89.178.62
+10.56.48.40
+10.56.48.40
+10.199.103.248
+10.240.144.183
+10.39.94.109
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.56.48.40
+10.39.94.109
+10.115.118.78
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.150.24.40
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.172.169.53
+10.30.47.170
+10.30.47.170
+10.30.47.170
+10.30.47.170
+10.30.47.170
+10.103.184.104
+10.75.116.199
+10.30.47.170
+10.127.162.239
+10.155.95.124
+10.155.95.124
+10.155.95.124
+10.155.95.124
+10.30.47.170
+10.155.95.124
+10.155.95.124
+10.155.95.124
+10.30.47.170
+10.155.95.124
+10.155.95.124
+10.194.174.4
+10.194.174.4
+10.194.174.4
+10.194.174.4
+10.194.174.4
+10.194.174.4
+10.194.174.4
+10.177.216.164
+10.177.216.164
+10.177.216.164
+10.177.216.164
+10.177.216.164
+10.177.216.164
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.247.111.104
+10.187.212.83
+10.73.60.200
+10.247.229.13
+10.200.184.212
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.140.141.1
+10.126.161.13
+10.126.161.13
+10.126.161.13
+10.126.161.13
+10.126.161.13
+10.126.161.13
+10.126.161.13
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.165.106.173
+10.240.144.183
+10.165.106.173
+10.249.130.132
+10.249.130.132
+10.249.130.132
+10.72.208.27
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.165.106.173
+10.4.79.47
+10.4.79.47
+10.165.106.173
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.4.79.47
+10.165.106.173
+10.4.79.47
+10.240.144.183
+10.95.232.88
+10.241.9.187
+10.199.103.248
+10.240.144.183
+10.63.233.249
+10.240.144.183
+10.186.56.183
+10.63.233.249
+10.63.233.249
+10.63.233.249
+10.240.144.183
+10.240.144.183
+10.240.144.183
+10.123.35.235
+10.63.233.249
+10.63.233.249
+10.63.233.249
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.186.56.126
+10.131.163.73
+10.226.130.133
+10.191.172.11
+10.73.134.9
+10.73.134.9
+10.73.134.9
+10.73.134.9
+10.87.209.46
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.1.181.142
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.220.112.1
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.14.2.86
+10.14.2.86
+10.14.2.86
+10.14.2.86
+10.14.2.86
+10.14.2.86
+10.181.38.207
+10.181.38.207
+10.181.38.207
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.209.18.39
+10.208.49.216
+10.208.49.216
+10.208.49.216
+10.15.208.56
+10.208.49.216
+10.14.2.86
+10.181.87.221
+10.14.2.86
+10.193.116.91
+10.142.203.173
+10.230.191.135
+10.50.41.216
+10.50.41.216
+10.50.41.216
+10.230.191.135
+10.230.191.135
+10.230.191.135
+10.230.191.135
+10.230.191.135
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.46.190.95
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.164.95.122
+10.136.84.60
+10.164.95.122
+10.117.224.230
+10.136.84.60
+10.136.84.60
+10.136.84.60
+10.136.84.60
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.50.226.223
+10.43.81.13
+10.6.238.124
+10.6.238.124
+10.6.238.124
+10.6.238.124
+10.6.238.124
+10.6.238.124
+10.174.246.84
+10.174.246.84
+10.174.246.84
+10.240.144.183
+10.118.250.30
+10.171.104.4
+10.142.203.173
+10.118.250.30
+10.30.164.32
+10.118.250.30
+10.1.1.236
+10.1.1.236
+10.1.1.236
+10.1.1.236
+10.1.1.236
+10.1.1.236
+10.1.1.236
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.10.55.142
+10.216.134.214
+10.238.230.235
+10.118.250.30
+10.244.166.195
+10.244.166.195
+10.244.166.195
+10.244.166.195
+10.244.166.195
+10.70.105.238
+10.222.246.34
+10.217.32.16
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.32.138.48
+10.61.147.24
+10.142.203.173
+10.142.203.173
+10.120.165.113
+10.221.62.23
+10.221.62.23
+10.221.62.23
+10.142.203.173
+10.142.203.173
+10.130.70.80
+10.142.203.173
+10.200.237.222
+10.240.144.183
+10.118.250.30
+10.72.137.86
+10.72.137.86
+10.72.137.86
+10.72.137.86
+10.72.137.86
+10.72.137.86
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.80.215.116
+10.206.73.206
+10.206.73.206
+10.206.73.206
+10.206.73.206
+10.206.73.206
+10.206.73.206
+10.206.73.206
+10.150.227.16
+10.74.218.123
+10.198.138.192
+10.240.144.183
+10.164.130.155
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.217.151.145
+10.66.208.82
+10.31.225.14
+10.31.225.14
+10.31.225.14
+10.31.225.14
+10.31.225.14
+10.31.225.14
+10.31.225.14
+10.22.108.103
+10.22.108.103
+10.22.108.103
+10.22.108.103
+10.120.207.127
+10.120.207.127
+10.120.207.127
+10.120.207.127
+10.66.208.82
+10.54.242.54
+10.143.126.177
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.54.242.54
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.69.20.85
+10.19.226.186
+10.19.226.186
+10.13.42.232
+10.118.250.30
+10.118.250.30
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.140.67.116
+10.124.155.234
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.64.224.191
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+10.190.174.142
+17/04/04 18:28:13 INFO mapred.LocalJobRunner:
+17/04/04 18:28:13 INFO mapred.MapTask: Starting flush of map output
+17/04/04 18:28:13 INFO mapred.MapTask: Spilling map output
+17/04/04 18:28:13 INFO mapred.MapTask: bufstart = 0; bufend = 22902; bufvoid = 104857600
+17/04/04 18:28:13 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26209220(104836880); length = 5177/6553600
+17/04/04 18:28:13 INFO mapred.MapTask: Finished spill 0
+17/04/04 18:28:13 INFO mapred.Task: Task:attempt_local2074403040_0001_m_000000_0 is done. And is in the process of committing
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: map
+17/04/04 18:28:13 INFO mapred.Task: Task 'attempt_local2074403040_0001_m_000000_0' done.
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: Finishing task: attempt_local2074403040_0001_m_000000_0
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: map task executor complete.
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: Starting task: attempt_local2074403040_0001_r_000000_0
+17/04/04 18:28:13 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/04 18:28:13 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/04 18:28:13 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@2b107a1
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=334338464, maxSingleShuffleLimit=83584616, mergeThreshold=220663392, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+17/04/04 18:28:13 INFO reduce.EventFetcher: attempt_local2074403040_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+17/04/04 18:28:13 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local2074403040_0001_m_000000_0 decomp: 25494 len: 25498 to MEMORY
+17/04/04 18:28:13 INFO reduce.InMemoryMapOutput: Read 25494 bytes from map-output for attempt_local2074403040_0001_m_000000_0
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 25494, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->25494
+17/04/04 18:28:13 WARN io.ReadaheadPool: Failed readahead on ifile
+EBADF: Bad file descriptor
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posix_fadvise(Native Method)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posixFadviseIfPossible(NativeIO.java:267)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX$CacheManipulator.posixFadviseIfPossible(NativeIO.java:146)
+	at org.apache.hadoop.io.ReadaheadPool$ReadaheadRequestImpl.run(ReadaheadPool.java:206)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+17/04/04 18:28:13 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: 1 / 1 copied.
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: finalMerge called with 1 in-memory map-outputs and 0 on-disk map-outputs
+17/04/04 18:28:13 INFO mapred.Merger: Merging 1 sorted segments
+17/04/04 18:28:13 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 25481 bytes
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: Merged 1 segments, 25494 bytes to disk to satisfy reduce memory limit
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: Merging 1 files, 25498 bytes from disk
+17/04/04 18:28:13 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+17/04/04 18:28:13 INFO mapred.Merger: Merging 1 sorted segments
+17/04/04 18:28:13 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 25481 bytes
+17/04/04 18:28:13 INFO mapred.LocalJobRunner: 1 / 1 copied.
+17/04/04 18:28:14 INFO mapreduce.Job:  map 100% reduce 0%
+17/04/04 18:28:14 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
+17/04/04 18:28:16 INFO mapred.Task: Task:attempt_local2074403040_0001_r_000000_0 is done. And is in the process of committing
+17/04/04 18:28:16 INFO mapred.LocalJobRunner: 1 / 1 copied.
+17/04/04 18:28:16 INFO mapred.Task: Task attempt_local2074403040_0001_r_000000_0 is allowed to commit now
+17/04/04 18:28:17 INFO output.FileOutputCommitter: Saved output of task 'attempt_local2074403040_0001_r_000000_0' to hdfs://localhost:1234/user/virtue/output2/_temporary/0/task_local2074403040_0001_r_000000
+17/04/04 18:28:17 INFO mapred.LocalJobRunner: reduce > reduce
+17/04/04 18:28:17 INFO mapred.Task: Task 'attempt_local2074403040_0001_r_000000_0' done.
+17/04/04 18:28:17 INFO mapred.LocalJobRunner: Finishing task: attempt_local2074403040_0001_r_000000_0
+17/04/04 18:28:17 INFO mapred.LocalJobRunner: reduce task executor complete.
+17/04/04 18:28:17 INFO mapreduce.Job:  map 100% reduce 100%
+17/04/04 18:28:18 INFO mapreduce.Job: Job job_local2074403040_0001 completed successfully
+17/04/04 18:28:18 INFO mapreduce.Job: Counters: 35
+	File System Counters
+		FILE: Number of bytes read=59134
+		FILE: Number of bytes written=640600
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=286168
+		HDFS: Number of bytes written=3611
+		HDFS: Number of read operations=13
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=4
+	Map-Reduce Framework
+		Map input records=1295
+		Map output records=1295
+		Map output bytes=22902
+		Map output materialized bytes=25498
+		Input split bytes=126
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=227
+		Reduce shuffle bytes=25498
+		Reduce input records=1295
+		Reduce output records=227
+		Spilled Records=2590
+		Shuffled Maps =1
+		Failed Shuffles=0
+		Merged Map outputs=1
+		GC time elapsed (ms)=0
+		Total committed heap usage (bytes)=482344960
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters
+		Bytes Read=143084
+	File Output Format Counters
+		Bytes Written=3611
+
+
+Step-9
+
+virtue@virtue-OptiPlex-745:~/Desktop$ ~/hadoop/bin/hadoop dfs -cat output2/*
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+10.1.1.236	7
+10.1.181.142	14
+10.1.232.31	5
+10.10.55.142	14
+10.102.101.66	1
+10.103.184.104	1
+10.103.190.81	53
+10.103.63.29	1
+10.104.73.51	1
+10.105.160.183	1
+10.108.91.151	1
+10.109.21.76	1
+10.11.131.40	1
+10.111.71.20	8
+10.112.227.184	6
+10.114.74.30	1
+10.115.118.78	1
+10.117.224.230	1
+10.117.76.22	12
+10.118.19.97	1
+10.118.250.30	7
+10.119.117.132	23
+10.119.33.245	1
+10.119.74.120	1
+10.12.113.198	2
+10.12.219.30	1
+10.120.165.113	1
+10.120.207.127	4
+10.123.124.47	1
+10.123.35.235	1
+10.124.148.99	1
+10.124.155.234	1
+10.126.161.13	7
+10.127.162.239	1
+10.128.11.75	10
+10.13.42.232	1
+10.130.195.163	8
+10.130.70.80	1
+10.131.163.73	1
+10.131.209.116	5
+10.132.19.125	2
+10.133.222.184	12
+10.134.110.196	13
+10.134.242.87	1
+10.136.84.60	5
+10.14.2.86	8
+10.14.4.151	2
+10.140.139.116	1
+10.140.141.1	9
+10.140.67.116	1
+10.141.221.57	5
+10.142.203.173	7
+10.143.126.177	32
+10.144.147.8	1
+10.15.208.56	1
+10.15.23.44	13
+10.150.212.239	14
+10.150.227.16	1
+10.150.24.40	13
+10.152.195.138	8
+10.153.23.63	2
+10.153.239.5	25
+10.155.95.124	9
+10.156.152.9	1
+10.157.176.158	1
+10.164.130.155	1
+10.164.49.105	8
+10.164.95.122	10
+10.165.106.173	14
+10.167.1.145	19
+10.169.158.88	1
+10.170.178.53	1
+10.171.104.4	1
+10.172.169.53	18
+10.174.246.84	3
+10.175.149.65	1
+10.175.204.125	15
+10.177.216.164	6
+10.179.107.170	2
+10.181.38.207	13
+10.181.87.221	1
+10.185.152.140	1
+10.186.56.126	16
+10.186.56.183	1
+10.187.129.140	6
+10.187.177.220	1
+10.187.212.83	1
+10.187.28.68	1
+10.19.226.186	2
+10.190.174.142	10
+10.190.41.42	5
+10.191.172.11	1
+10.193.116.91	1
+10.194.174.4	7
+10.198.138.192	1
+10.199.103.248	2
+10.199.189.15	1
+10.2.202.135	1
+10.200.184.212	1
+10.200.237.222	1
+10.200.9.128	2
+10.203.194.139	10
+10.205.72.238	2
+10.206.108.96	2
+10.206.175.236	1
+10.206.73.206	7
+10.207.190.45	17
+10.208.38.46	1
+10.208.49.216	4
+10.209.18.39	9
+10.209.54.187	3
+10.211.47.159	10
+10.212.122.173	1
+10.213.181.38	7
+10.214.35.48	1
+10.215.222.114	1
+10.216.113.172	48
+10.216.134.214	1
+10.216.227.195	16
+10.217.151.145	10
+10.217.32.16	1
+10.218.16.176	8
+10.22.108.103	4
+10.220.112.1	34
+10.221.40.89	5
+10.221.62.23	13
+10.222.246.34	1
+10.223.157.186	11
+10.225.137.152	1
+10.225.234.46	1
+10.226.130.133	1
+10.229.60.23	1
+10.230.191.135	6
+10.231.55.231	1
+10.234.15.156	1
+10.236.231.63	1
+10.238.230.235	1
+10.239.100.52	1
+10.239.52.68	4
+10.24.150.4	5
+10.24.67.131	13
+10.240.144.183	15
+10.240.170.50	1
+10.241.107.75	1
+10.241.9.187	1
+10.243.51.109	5
+10.244.166.195	5
+10.245.208.15	20
+10.246.151.162	3
+10.247.111.104	9
+10.247.175.65	1
+10.247.229.13	1
+10.248.24.219	1
+10.248.36.117	3
+10.249.130.132	3
+10.25.132.238	2
+10.25.44.247	6
+10.250.166.232	1
+10.27.134.23	1
+10.30.164.32	1
+10.30.47.170	8
+10.31.225.14	7
+10.32.138.48	11
+10.32.247.175	4
+10.32.55.216	12
+10.33.181.9	8
+10.34.233.107	1
+10.36.200.176	1
+10.39.45.70	2
+10.39.94.109	4
+10.4.59.153	1
+10.4.79.47	15
+10.41.170.233	9
+10.41.40.17	1
+10.42.208.60	1
+10.43.81.13	1
+10.46.190.95	10
+10.48.81.158	5
+10.5.132.217	1
+10.5.148.29	1
+10.50.226.223	9
+10.50.41.216	3
+10.52.161.126	1
+10.53.58.58	1
+10.54.242.54	10
+10.54.49.229	1
+10.56.48.40	16
+10.59.42.194	11
+10.6.238.124	6
+10.61.147.24	1
+10.61.161.218	1
+10.61.23.77	8
+10.61.232.147	3
+10.62.78.165	2
+10.63.233.249	7
+10.64.224.191	13
+10.66.208.82	2
+10.69.20.85	26
+10.70.105.238	1
+10.70.238.46	6
+10.72.137.86	6
+10.72.208.27	1
+10.73.134.9	4
+10.73.238.200	1
+10.73.60.200	1
+10.73.64.91	1
+10.74.218.123	1
+10.75.116.199	1
+10.76.143.30	1
+10.76.68.178	16
+10.78.95.24	8
+10.80.10.131	10
+10.80.215.116	17
+10.81.134.180	1
+10.82.30.199	63
+10.82.64.235	1
+10.84.236.242	1
+10.87.209.46	1
+10.87.88.214	1
+10.88.204.177	1
+10.89.178.62	1
+10.89.244.42	1
+10.94.196.42	1
+10.95.136.211	4
+10.95.232.88	1
+10.98.156.141	1
+10.99.228.224	1
+
+Step-10
+
+virtue@virtue-OptiPlex-745:~/Desktop$
+
+HIVE:
+
+4. WRITE AN APPLICATION USING HBASE AND HIVEQL FOR FLIGHT INFORMATION SYSTEM WHICH WILL INCLUDE
+1) Creating, Dropping, and altering Database tables
+2) Creating an external Hive table to connect to the HBase for Customer Information Table
+3) Load table with data, insert new values and field in the table, Join tables with Hive
+4) Create index on Flight information Table 5) Find the average departure delay per day in 2008.
+SOLUTION
+
+
+# cd /usr/local/hive/bin
+
+#  ./hive
+(A) $ $HIVE_HOME/bin hive --service cli
+(B) hive> set hive.cli.print.current.db=true;
+(C) hive (default)> CREATE DATABASE ourfirstdatabase; OK
+Time taken: 3.756 seconds
+(D) hive (default)> USE ourfirstdatabase; OK
+Time taken: 0.039 seconds
+(E) hive (ourfirstdatabase)> CREATE TABLE our_first_table
+(
+> FirstName STRING,
+> LastName STRING,
+> EmployeeId INT);
+OK
+Time taken: 0.043 seconds
+hive (ourfirstdatabase)> quit;
+
+1)
+hduser@ubuntu:~$ start-all.sh
+hduser@ubuntu:~$ hive
+hive> set hive.cli.print.current.db=true;
+hive (default)> create database ourfirstdatabase;
+OK
+Time taken: 1.955 seconds
+hive (default)> use ourfirstdatabase;
+OK
+Time taken: 0.048 seconds
+hive (ourfirstdatabase)> create table our_first_table(firstname string,lastname string,employeeid int);
+OK
+Time taken: 0.873 seconds
+hive> show tables;
+OK
+our_first_table
+Time taken: 0.114 seconds, Fetched: 1 row(s)
+//set db properties use alter command
+hive> ALTER DATABASE ourfirstdatabase SET DBPROPERTIES
+    > ('creator'=Swapnali Ware',
+    > 'created_for'='Learning Hive DDL');
+OK
+Time taken: 0.315 seconds
+hive> DESCRIBE DATABASE EXTENDED ourfirstdatabase;
+OK
+ourfirstdatabase		hdfs://localhost:54310/user/hive/warehouse/ourfirstdatabase.db	hduser	USER	{created_for=Learning Hive DDL, creator=Swapnali Ware}
+Time taken: 0.091 seconds, Fetched: 1 row(s)
+hive> DROP DATABASE ourfirstdatabase CASCADE;
+OK
+Time taken: 1.691 seconds
+2)
+Table name Customer Information
+Rows	Column Families
+	          ContactInfo       	CustomerName
+
+	EA	SA	FN	MN	LN
+1	sbw.ware@sinhgad.edu	Lonavala	Swapnali	B	Ware
+2	riya.singh@xyz.com	Pune	Riya	S	Singh
+
+hbase(main):005:0> create 'CustomerInformation','ContactInfo','CustomerName'
+0 row(s) in 2.5900 seconds
+=> Hbase::Table - CustomerInformation
+hbase(main):006:0> list
+TABLE                                                                           
+CustomerInformation                                                             
+1 row(s) in 0.1070 seconds
+=> ["CustomerInformation"]
+hbase(main):001:0> list
+TABLE                                                                           
+CustomerInformation                                                             
+1 row(s) in 0.5790 seconds
+(main):002:0> put 'CustomerInformation',1,'ContactInfo:EA','sbw.sit@sinhgad.edu'
+0 row(s) in 0.6280 seconds
+hbase(main):003:0> put 'CustomerInformation',1,'ContactInfo:SA','Lanavala'
+0 row(s) in 0.0200 seconds
+
+hbase(main):004:0> put 'CustomerInformation',1,'CustomerName:FN','Swapnali'
+0 row(s) in 0.0530 seconds
+hbase(main):005:0> put 'CustomerInformation',1,'CustomerName:MN','B'
+0 row(s) in 0.0290 seconds
+hbase(main):006:0> put 'CustomerInformation',1,'CustomerName:LN','Ware'
+0 row(s) in 0.0040 seconds
+hbase(main):009:0> put 'CustomerInformation',2,'ContactInfo:EA','riya.singh@xyz.com'
+0 row(s) in 0.0060 seconds
+hbase(main):010:0> put 'CustomerInformation',2,'ContactInfo:SA','Pune'
+0 row(s) in 0.0140 seconds
+hbase(main):011:0> put 'CustomerInformation',2,'CustomerName:FN','Riya'
+0 row(s) in 0.0090 seconds
+hbase(main):012:0> put 'CustomerInformation',2,'CustomerName:MN','S'
+0 row(s) in 0.0170 seconds
+hbase(main):013:0> put 'CustomerInformation',2,'CustomerName:LN','Singh'
+0 row(s) in 0.0160 seconds
+hbase(main):014:0> scan 'CustomerInformation'
+ROW                   COLUMN+CELL                                               
+ 1                    column=ContactInfo:EA, timestamp=1512450536862, value=sbw.
+                      sit@sinhgad.edu                                           
+ 1                    column=ContactInfo:SA, timestamp=1512450573649, value=Lana
+                      vala                                                      
+ 1                    column=CustomerName:FN, timestamp=1512450617894, value=Swa
+                      pnali                                                     
+ 1                    column=CustomerName:LN, timestamp=1512450643726, value=War
+                      e                                                         
+ 1                    column=CustomerName:MN, timestamp=1512450630986, value=B  
+ 2                    column=ContactInfo:EA, timestamp=1512450750624, value=riya
+                      .singh@xyz.com                                            
+ 2                    column=ContactInfo:SA, timestamp=1512450771492, value=Pune
+ 2                    column=CustomerName:FN, timestamp=1512450784697, value=Riy
+                      a                                                         
+ 2                    column=CustomerName:LN, timestamp=1512450840361, value=Sin
+                      gh                                                        
+ 2                    column=CustomerName:MN, timestamp=1512450819560, value=S  
+2 row(s) in 0.2040 seconds
+Goto Hive terminal
+•	In Step (A), you create an external table with a Key field to link up with the HBase row keys (1 and 2), and two map data types (name and info) to link up with the two column families (ContactInfo and CustomerName).
+•	Note the syntax for providing this linkage via the WITH SERDEPROPERTIES keywords. This SerDe con-figuration technique is quite common in Hive DDL.
+•	Note as well that the TBLPROPERTIES keyword is crucial for connecting the new external hive_ hbase_table with the actual CustomerInformation HBase table name.
+•	Step (B) shows how the key value pairs in HBase ({“FN”,”Swapnali”}, for example) are now available for querying with the help of the HiveQL. Note the syntax for accessing the Hive map data type in Step (C). You can select the value of the info map type using the notation info ["EA"] where "EA" is the key.
+
+hive> CREATE EXTERNAL TABLE hive_hbase_table (
+    > key INT,
+    > name map<STRING,STRING>,
+    > info map<STRING, STRING>)
+    > STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+    > WITH SERDEPROPERTIES ("hbase.columns.mapping" =
+    > ": key, CustomerName:, ContactInfo:")
+    > TBLPROPERTIES ("hbase.table.name" = "CustomerInformation");
+OK
+Time taken: 6.248 seconds
+hive>  SELECT * FROM hive_hbase_table;
+OK
+1	{"FN":"Swapnali","LN":"Ware","MN":"B"}	{"EA":"sbw.sit@sinhgad.edu","SA":"Lanavala"}
+2	{"FN":"Riya","LN":"Singh","MN":"S"}	
+            {"EA":"riya.singh@xyz.com","SA":"Pune"}
+Time taken: 2.343 seconds, Fetched: 2 row(s)
+hive> SELECT info["EA"] FROM hive_hbase_table WHERE
+    > name["FN"] = "Swapnali" AND name["LN"] = "Ware";
+OK
+sbw.sit@sinhgad.edu
+Time taken: 4.981 seconds, Fetched: 1 row(s)
+3) Download data set of 2007 & 2008 from http://stat-computing.org/dataexpo/2009/the-data.html
+
+Variable descriptions
+	Name	Description
+1	Year	1987-2008
+2	Month	1-12
+3	DayofMonth	1-31
+4	DayOfWeek	1 (Monday) - 7 (Sunday)
+5	DepTime	actual departure time (local, hhmm)
+6	CRSDepTime	scheduled departure time (local, hhmm)
+7	ArrTime	actual arrival time (local, hhmm)
+8	CRSArrTime	scheduled arrival time (local, hhmm)
+9	UniqueCarrier	unique carrier code
+
+10	FlightNum	flight number
+11	TailNum	plane tail number
+12	ActualElapsedTime	in minutes
+13	CRSElapsedTime	in minutes
+14	AirTime	in minutes
+15	ArrDelay	arrival delay, in minutes
+16	DepDelay	departure delay, in minutes
+17	Origin	origin IATA airport code
+
+18	Dest	destination IATA airport code
+
+19	Distance	in miles
+20	TaxiIn	taxi in time, in minutes
+21	TaxiOut	taxi out time in minutes
+22	Cancelled	was the flight cancelled?
+23	CancellationCode	reason for cancellation (A = carrier, B = weather, C = NAS, D = security)
+24	Diverted	1 = yes, 0 = no
+25	CarrierDelay	in minutes
+26	WeatherDelay	in minutes
+27	NASDelay	in minutes
+28	SecurityDelay	in minutes
+29	LateAircraftDelay	in minutes
+Integer type data can be specified using integral data types, INT. When the data range exceeds the range of INT, you need to use BIGINT and if the data range is smaller than the INT, you use SMALLINT. TINYINT is smaller than SMALLINT.
+
+Int 2 bytes storage size -32,768 to 32,767 or 4 bytes storage size -2,147,483,648 to 2,147,483,647
+
+Unsigned Int 0 to 65,535 / 0 to 4,294,967,295
+Big int 8 bytes storage -2^63(-9,223,372,036,854,775,808) to 2^63-1(9,223,372,036,854,775,807)
+smallint 2 bytes storage -2^15(-32,768 ) to 2^15-1 32,767)   
+tinyint 0 to 255
+
+
+ CREATE TABLE IF NOT EXISTS FlightInfo2007
+     (
+ Year SMALLINT, Month TINYINT, DayofMonth TINYINT,
+ DayOfWeek TINYINT,
+  DepTime SMALLINT, CRSDepTime SMALLINT, ArrTime SMALLINT,CRSArrTime SMALLINT,
+     UniqueCarrier STRING, FlightNum STRING, TailNum STRING,
+     ActualElapsedTime SMALLINT, CRSElapsedTime SMALLINT,
+     AirTime SMALLINT, ArrDelay SMALLINT, DepDelay SMALLINT,
+     Origin STRING, Dest STRING,Distance INT,
+     TaxiIn SMALLINT, TaxiOut SMALLINT, Cancelled SMALLINT,
+    CancellationCode STRING, Diverted SMALLINT,
+     CarrierDelay SMALLINT, WeatherDelay SMALLINT,
+    NASDelay SMALLINT, SecurityDelay SMALLINT,
+    LateAircraftDelay
+    SMALLINT)
+    COMMENT 'Flight InfoTable'
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY ','
+    STORED AS TEXTFILE
+    TBLPROPERTIES ('creator'='PSB ', 'created_at'='Tues Dec 5 3:00:00 EDT 2017');
+OK
+    > LINES TERMINATED BY '\n'
+
+Time taken: 0.292 seconds
+hive> load data local inpath '/home/student/Desktop/2007.csv' into table FlightInfo2007;
+hive> CREATE TABLE IF NOT EXISTS FlightInfo2008 LIKE FlightInfo2007;
+hive> load data local inpath '/home/hduser/Desktop/2008.csv' into table FlightInfo2008;
+
+hive> CREATE TABLE IF NOT EXISTS myFlightInfo (
+    Year SMALLINT, DontQueryMonth TINYINT, DayofMonth
+    TINYINT, DayOfWeek TINYINT, DepTime SMALLINT, ArrTime SMALLINT,
+    UniqueCarrier STRING, FlightNum STRING,
+    AirTime SMALLINT, ArrDelay SMALLINT, DepDelay SMALLINT,
+    Origin STRING, Dest STRING, Cancelled SMALLINT,
+    CancellationCode STRING)
+    COMMENT 'Flight InfoTable'
+    PARTITIONED BY(Month TINYINT)
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+    STORED AS RCFILE TBLPROPERTIES ('creator'=’swapnali ware’,
+    'created_at'='Mon sep 2 14:24:19 EDT 2017');
+OK
+Time taken: 1.697 seconds
+hive> INSERT OVERWRITE TABLE myflightinfo PARTITION (Month=1)
+    > SELECT Year, Month, DayofMonth, DayOfWeek, DepTime,
+    > ArrTime, UniqueCarrier,FlightNum, AirTime, ArrDelay, DepDelay, Origin,
+    > Dest, Cancelled,CancellationCode FROM FlightInfo2008 WHERE Month=1;
+hive> FROM FlightInfo2008 INSERT INTO TABLE myflightinfo
+    > PARTITION (Month=2) SELECT Year, Month, DayofMonth, DayOfWeek, DepTime,
+    > ArrTime, UniqueCarrier, FlightNum,
+    > AirTime, ArrDelay, DepDelay, Origin, Dest, Cancelled,
+    > CancellationCode WHERE Month=2
+    > INSERT INTO TABLE myflightinfo
+    > PARTITION (Month=12)
+    > SELECT Year, Month, DayofMonth, DayOfWeek, DepTime,
+    > ArrTime, UniqueCarrier, FlightNum,
+    > AirTime, ArrDelay, DepDelay, Origin, Dest, Cancelled,
+    > CancellationCode WHERE Month=12;
+
+hive> SHOW PARTITIONS myflightinfo;
+OK
+month=1
+month=12
+month=2
+Time taken: 0.344 seconds, Fetched: 3 row(s)
+hive> CREATE TABLE myflightinfo2007 AS
+    > SELECT Year, Month, DepTime, ArrTime, FlightNum,
+    > Origin, Dest FROM FlightInfo2007
+    > WHERE (Month = 7 AND DayofMonth = 3) AND
+    > (Origin='JFK' AND Dest='ORD');
+hive>SELECT * FROM myFlightInfo2007;
+OK
+2007	7	700	834	5447	JFK	ORD
+2007	7	1633	1812	5469	JFK	ORD
+2007	7	1905	2100	5492	JFK	ORD
+2007	7	1453	1624	4133	JFK	ORD
+2007	7	1810	1956	4392	JFK	ORD
+2007	7	643	759	903	JFK	ORD
+2007	7	939	1108	907	JFK	ORD
+2007	7	1313	1436	915	JFK	ORD
+2007	7	1617	1755	917	JFK	ORD
+2007	7	2002	2139	919	JFK	ORD
+Time taken: 1.219 seconds, Fetched: 10 row(s)
+hive> CREATE TABLE myFlightInfo2008 AS
+    > SELECT Year, Month, DepTime, ArrTime, FlightNum,
+    > Origin, Dest FROM FlightInfo2008
+    > WHERE (Month = 7 AND DayofMonth = 3) AND
+    > (Origin='JFK' AND Dest='ORD');
+hive> SELECT * FROM myFlightInfo2008;
+OK
+2008	7	930	1103	5199	JFK	ORD
+2008	7	705	849	5687	JFK	ORD
+2008	7	1645	1914	5469	JFK	ORD
+2008	7	1345	1514	4392	JFK	ORD
+2008	7	1718	1907	1217	JFK	ORD
+2008	7	757	929	1323	JFK	ORD
+2008	7	928	1057	907	JFK	ORD
+2008	7	1358	1532	915	JFK	ORD
+2008	7	1646	1846	917	JFK	ORD
+2008	7	2129	2341	919	JFK	ORD
+Time taken: 0.424 seconds, Fetched: 10 row(s)
+JOIN
+Hive>SELECT m8.Year, m8.Month, m8.FlightNum, m8.Origin, m8.Dest, m7.Year, m7.Month, m7.FlightNum, m7.Origin, m7.Dest FROM myFlightinfo2008 m8 JOIN myFlightinfo2007 m7 ON m8.FlightNum=m7.FlightNum;
+2008	7	5469	JFK	ORD	2007	7	5469	JFK	ORD
+2008	7	4392	JFK	ORD	2007	7	4392	JFK	ORD
+2008	7	907	JFK	ORD	2007	7	907	JFK	ORD
+2008	7	915	JFK	ORD	2007	7	915	JFK	ORD
+2008	7	917	JFK	ORD	2007	7	917	JFK	ORD
+2008	7	919	JFK	ORD	2007	7	919	JFK	ORD
+hive> SELECT m8.FlightNum,m8.Origin,m8.Dest,m7.FlightNum,m7.Origin,m7.Dest FROM myFlightinfo2008 m8 FULL OUTER JOIN myFlightinfo2007 m7 ON m8.FlightNum=m7.FlightNum;
+1217	JFK	ORD	NULL	NULL	NULL
+1323	JFK	ORD	NULL	NULL	NULL
+NULL	NULL	NULL	4133	JFK	ORD
+4392	JFK	ORD	4392	JFK	ORD
+5199	JFK	ORD	NULL	NULL	NULL
+NULL	NULL	NULL	5447	JFK	ORD
+5469	JFK	ORD	5469	JFK	ORD
+NULL	NULL	NULL	5492	JFK	ORD
+5687	JFK	ORD	NULL	NULL	NULL
+NULL	NULL	NULL	903	JFK	ORD
+907	JFK	ORD	907	JFK	ORD
+915	JFK	ORD	915	JFK	ORD
+917	JFK	ORD	917	JFK	ORD
+919	JFK	ORD	919	JFK	ORD
+Time taken: 10.33 seconds, Fetched: 14 row(s)
+hive>SELECT  m8.Year,m8.Month,m8.FlightNum,m8.Origin,m8.Dest,m7.Year,m7.Month,m7.FlightNum,m7.Origin,m7.Dest FROM myFlightinfo2008 m8 LEFT OUTER JOIN myFlightinfo2007 m7 ON m8.FlightNum=m7.FlightNum;
+2008	7	5199	JFK	ORD	NULL	NULL	NULL	NULL	NULL
+2008	7	5687	JFK	ORD	NULL	NULL	NULL	NULL	NULL
+2008	7	5469	JFK	ORD	2007	7	5469	JFK	ORD
+2008	7	4392	JFK	ORD	2007	7	4392	JFK	ORD
+2008	7	1217	JFK	ORD	NULL	NULL	NULL	NULL	NULL
+2008	7	1323	JFK	ORD	NULL	NULL	NULL	NULL	NULL
+2008	7	907	JFK	ORD	2007	7	907	JFK	ORD
+2008	7	915	JFK	ORD	2007	7	915	JFK	ORD
+2008	7	917	JFK	ORD	2007	7	917	JFK	ORD
+2008	7	919	JFK	ORD	2007	7	919	JFK	ORD
+
+
+hive> CREATE INDEX f08_index ON TABLE flightinfo2008 (Origin) AS
+    > 'COMPACT' WITH DEFERRED REBUILD;
+OK
+Time taken: 1.124 seconds
+hive> ALTER INDEX f08_index ON flightinfo2008 REBUILD;
+hive>SHOW INDEXES ON FlightInfo2008;
+OK
+f08_index           	flightinfo2008      	origin              	default__flightinfo2008_f08_index__	compact             	
+Time taken: 2.549 seconds, Fetched: 1 row(s)
+hive> SELECT Origin, COUNT(1) FROM
+    > flightinfo2008 WHERE Origin = 'SYR' GROUP BY Origin;
+hive> DESCRIBE default__flightinfo2008_f08_index__;
+OK
+origin              	string              	                    
+_bucketname         	string              	                    
+_offsets            	array<bigint>       	                    
+Time taken: 0.927 seconds, Fetched: 3 row(s)
+hive> SELECT Origin, SIZE(`_offsets`)
+    > FROM default__flightinfo2008_f08_index__ WHERE origin='SYR';
+OK
+SYR	12032
+Time taken: 0.705 seconds, Fetched: 1 row(s)
+hive> CREATE VIEW avgdepdelay AS
+    > SELECT DayOfWeek, AVG(DepDelay) FROM
+    > FlightInfo2008 GROUP BY DayOfWeek;
+hive> SELECT * FROM avgdepdelay;
+3	8.289761053658728
+6	8.645680904903614
+1	10.269990244459473
+4	9.772897177836702
+7	11.568973392595312
+2	8.97689712068735
+5	12.158036387869656
+
+• Day 5 under the results in Step (B) — had the highest number of delays.
+
+• Step (A): We want to point out that Hive’s Data Definition Language (DDL) also includes the CREATE VIEW statement, which can be quite useful. In Hive, views allow a query to be saved but data is not stored as with the Create Table as Select (CTAS) statement.
+
+• When a view is referenced in HiveQL, Hive executes the query and then uses the results which could be part of a larger query. This can be very useful to simplify complex queries and break them down into logical components.
+
+• Additionally, the GROUP BY clause, which gathers all the days per week and allows the AVG aggregate function to provide a consolidated answer per day.
+• After we answered our question above about average flight delays per day,
+
+
